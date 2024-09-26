@@ -12,7 +12,7 @@ def full_load_fun() -> str:
         """ Parameter required for the classes """
 
         # Youtube API Key
-        Api_Key = "AIzaSyCdaIcTZH726agV2K9WFQi-VgcWjn7__Qo"
+        Api_Key = ""
         """
         This is @straitstimesonline channel id
         """
