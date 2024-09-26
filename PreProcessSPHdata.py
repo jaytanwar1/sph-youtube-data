@@ -80,6 +80,8 @@ class RawToProcess:
             itr_pre_processed_json['videoId'] = Video_id
             Published_date = datetime.datetime.strptime(str(Published_date), "%Y-%m-%dT%H:%M:%SZ")
 
+            print(f"channel id : {Channel_id} , video_id {Video_id} ,  publish date : {Published_date}")
+
             self.distribute_data(itr_pre_processed_json, Published_date)
 
             # Add the pre-processed record to the list of pre-processed data.
@@ -117,6 +119,7 @@ class RawToProcess:
             json_object = json.loads(json_data)
 
             # Construct the S3 object key.
+            #print("dump to clean")
             data = json.dumps(json_object).encode('UTF-8')
             self.s3_client.put_object(Body=data, Bucket=self.clean_bucket_name, Key=s3_file_name)
 
@@ -159,7 +162,7 @@ class RawToProcess:
 if __name__ == "__main__":
     raw_bucket_name = "sph-raw-data"
     clean_bucket_name = "sph-clean-data"
-    raw_file_name = "put_data_from2024-9-4-17_to_2024-9-11-17"
+    raw_file_name = "put_data_from2024-9-19-15_to_2024-9-22-15"
 
     RawToProcess = RawToProcess(raw_bucket_name , clean_bucket_name)
     RawToProcess.run(raw_file_name = raw_file_name)

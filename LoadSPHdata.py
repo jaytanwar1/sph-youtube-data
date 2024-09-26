@@ -178,15 +178,18 @@ class FullLoadDataToS3():
             End_date_ = f"{End_Date_Year}-{End_Date_Month}-{End_Date_Day}-{End_Date_Hour}"
 
             # Create the final S3 key name
-            File_Name = f"put_data_from{End_date_}_to_{Now_Date}"
+            #File_Name = f"put_data_from{End_date_}_to_{Now_Date}"
+            channel_id = self.Channel_Id
+            File_Name = f"channelid = {channel_id}/put_data_from{End_date_}_to_{Now_Date}"
 
-            # Convert the data to JSON and encode it in UTF-8
+            # Convert the data to JSON and encode it in UTF-8\
             Data = json.dumps(Data)
             Json_Object = json.loads(Data)
             Data = json.dumps(Json_Object).encode('UTF-8')
 
             # Save the data to S3
             self.S3_Client.put_object(Body=Data, Bucket=Bucket_Name, Key=File_Name)
+            #self.s3_client.put_object(Bucket="sph-tgt-data", Key=partitioned_file_name, Body=json_string)
 
             return ["Sucesss", File_Name]
         except Exception as e:
@@ -200,14 +203,14 @@ if __name__ == "__main__":
     """
     This is @straitstimesonline channel id
     """
-    channel_id = 'UC4p_I9eiRewn2KoU-nawrDg'
+    #channel_id = 'UC4p_I9eiRewn2KoU-nawrDg'
 
     #Creating an instance of our class FullLoadDataToS3
     FullLoadDataToS3_obj = FullLoadDataToS3(api_key,channel_id)
 
     #Create a date that is 7 days before now
     now = datetime.datetime.now()
-    seven_day = datetime.timedelta(days=7) # It is to fetch the data range it means & days of data
+    seven_day = datetime.timedelta(days=3) # It is to fetch the data range it means & days of data
     # Subtract Seven day from the current datetime
     a_week = now - seven_day
 

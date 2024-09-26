@@ -37,9 +37,19 @@ class SPHDataTransformIngest:
                 res = self.s3_client.get_object(Bucket=Clean_Bucket_name, Key=file_name)
                 data = res['Body'].read()
                 vid_stats_final = self.clean_data(data=data)
-                #pd.set_option('display.max_rows', None)  # Set to None to display all rows
-                #pd.set_option('display.max_columns', None)  # Set to None to display all columns
-                #print(t_series)
+                #print(vid_stats_final)
+
+                for channel_id, group in vid_stats_final.groupby('channelId'):
+                    # Convert the group of data to JSON with each record on a new line
+                    json_records = group.to_dict(orient='records')
+                    formatted_date = end_date.strftime('%d%m%y%H%M')
+                    partitioned_file_name = f"channelid={channel_id}/sphYTtgtdata_{formatted_date}.json"
+
+                    # Convert the data to JSON and upload it directly to S3 without saving to the local /tmp/ directory
+                    json_string = "\n".join([json.dumps(record) for record in json_records])
+
+                    # Upload the JSON string directly to S3 partitioned by channel_id
+                    self.s3_client.put_object(Bucket="sph-tgt-data", Key=partitioned_file_name, Body=json_string)
 
             except Exception as e:
                 error = str(e)
@@ -48,12 +58,16 @@ class SPHDataTransformIngest:
                 continue
 
         print(vid_stats_final)
-        json_string = json.dumps(vid_stats_final.to_dict(orient='records'))
-        json_buffer =bytes(json_string, 'utf-8')
-        file_name = "new_file"+str(end_date)
-        self.s3_client.put_object(Bucket="sph-tgt-data", Key=file_name, Body=json_buffer)
-
+        # json_records = vid_stats_final.to_dict(orient='records')
+        # formatted_date = end_date.strftime('%d%m%y%H%M')
+        # file_name = f"sphYTtgtdata_{formatted_date}.json"
+        #
+        # json_string = "\n".join([json.dumps(record) for record in json_records])
+        #
+        # self.s3_client.put_object(Bucket="sph-tgt-data", Key=file_name, Body=json_string)
+        #
         metadata = {"last_update_date":str(end_date)}
+        print(metadata)
         metadata_json = json.dumps(metadata)
         self.s3_client.put_object(Bucket="sph-bookmark", Key="Bookmark", Body=metadata_json)
         print("Ending Script 3")
@@ -84,8 +98,8 @@ class SPHDataTransformIngest:
 
 if __name__ == "__main__":
     Clean_Bucket_name ="sph-clean-data"
-    start_date = datetime.datetime(2024,9, 5 , 6)
-    end_date = datetime.datetime(2024,9,11,8)
+    start_date = datetime.datetime(2024,9, 20 , 2)
+    end_date = datetime.datetime(2024,9,21,12)
     # start_date = datetime.datetime(2023, 10, 1 , 11)
     # end_date = datetime.datetime(2023,10,8,11)
 
