@@ -2,7 +2,8 @@ from googleapiclient.discovery import build
 import json
 import datetime
 import boto3
-
+import requests
+from tqdm import tqdm
 
 
 class FullLoadDataToS3():
@@ -52,8 +53,6 @@ class FullLoadDataToS3():
         except Exception as e:
 
             print("Error in Script 1 :", str(e))
-
-
 
     def fetch_data_from_yt(self, End_Date) -> list:
         """
@@ -196,6 +195,37 @@ class FullLoadDataToS3():
             print("Error while loading the raw_data to S3:", str(e))
             return "Failed"
 
+
+    def get_channel_statistics(self, Bucket_Name):
+        """Extract the channel statistics"""
+        print('get channel statistics...')
+        url = f'https://www.googleapis.com/youtube/v3/channels?part=statistics&id={self.Channel_Id}&key={self.Api_Key}'
+        #print(url)
+        #pbar = tqdm(total=1)
+
+        json_url = requests.get(url)
+        data = json.loads(json_url.text)
+        #print(data)
+        try:
+            data = data['items'][0]['statistics'] # Access 1st value from items(json) data i.e statistics
+            print(data)
+            # {'viewCount': '377489787', 'subscriberCount': '594000', 'hiddenSubscriberCount': False, 'videoCount': '30646'}
+            channel_id = self.Channel_Id
+            File_Name = f"channelid={channel_id}/statistics_{channel_id}.json"
+            # Convert the data to JSON
+            Data = json.dumps(data)
+            # Save the data to S3
+            self.S3_Client.put_object(Body=Data, Bucket=Bucket_Name, Key=File_Name)
+            # self.s3_client.put_object(Bucket="sph-tgt-data", Key=partitioned_file_name, Body=json_string)
+        except KeyError:
+            print('Could not get channel statistics')
+            data = {}
+
+        #self.channel_statistics = data
+        #pbar.update()
+        #pbar.close()
+        return data
+
 if __name__ == "__main__":
     #Youtube API Key
     api_key = "AIzaSyCdaIcTZH726agV2K9WFQi-VgcWjn7__Qo"
@@ -203,7 +233,7 @@ if __name__ == "__main__":
     """
     This is @straitstimesonline channel id
     """
-    #channel_id = 'UC4p_I9eiRewn2KoU-nawrDg'
+    channel_id = 'UC4p_I9eiRewn2KoU-nawrDg'
 
     #Creating an instance of our class FullLoadDataToS3
     FullLoadDataToS3_obj = FullLoadDataToS3(api_key,channel_id)

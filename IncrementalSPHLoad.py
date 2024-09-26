@@ -29,6 +29,7 @@ def Increamental_Load():
         # Creating an instance of our class FullLoadDataToS3
         #FullLoadDataToS3_obj = FullLoadDataToS3(api_key, channel_id)
         Bucket_name = "sph-raw-data" #"my-bucket-2521"
+        Stats_Bucket_Name = "sph-stats-data"
         now = datetime.datetime.now()
         date_object = a_week
         a_week = datetime.datetime.strptime(date_object, '%Y-%m-%d %H:%M:%S.%f')
@@ -39,6 +40,7 @@ def Increamental_Load():
         for channel_id in channel_ids:
             print(f"Processing data for Channel ID: {channel_id}")
             FullLoadDataToS3_obj = FullLoadDataToS3(api_key, channel_id)
+            FullLoadDataToS3_obj.get_channel_statistics(Stats_Bucket_Name)
             raw_file_name = FullLoadDataToS3_obj.run(End_Date=a_week, Bucket_Name=Bucket_name)
             print(raw_file_name[1])
             if raw_file_name[1] != 0:
