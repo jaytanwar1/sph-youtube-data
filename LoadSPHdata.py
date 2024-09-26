@@ -228,7 +228,7 @@ class FullLoadDataToS3():
 
 if __name__ == "__main__":
     #Youtube API Key
-    api_key = "AIzaSyCdaIcTZH726agV2K9WFQi-VgcWjn7__Qo"
+    api_key = ""
 
     """
     This is @straitstimesonline channel id

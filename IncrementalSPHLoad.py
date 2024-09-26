@@ -16,7 +16,7 @@ def Increamental_Load():
         from PreProcessSPHdata import RawToProcess
         from TransformSPHdata import SPHDataTransformIngest
         import datetime
-        api_key = "AIzaSyCdaIcTZH726agV2K9WFQi-VgcWjn7__Qo"
+        api_key = "" # add api key
 
         channel_ids = [
             'UC4p_I9eiRewn2KoU-nawrDg',  # Strait Times
@@ -40,7 +40,7 @@ def Increamental_Load():
         for channel_id in channel_ids:
             print(f"Processing data for Channel ID: {channel_id}")
             FullLoadDataToS3_obj = FullLoadDataToS3(api_key, channel_id)
-            FullLoadDataToS3_obj.get_channel_statistics(Stats_Bucket_Name)
+            #FullLoadDataToS3_obj.get_channel_statistics(Stats_Bucket_Name)
             raw_file_name = FullLoadDataToS3_obj.run(End_Date=a_week, Bucket_Name=Bucket_name)
             print(raw_file_name[1])
             if raw_file_name[1] != 0:
@@ -48,8 +48,8 @@ def Increamental_Load():
                 clean_bucket_name = "sph-clean-data"
                 # raw_file_name = "put_data_from2023-9-29-7_to_2023-10-6-7"
 
-                RawToProcess = RawToProcess(raw_bucket_name, clean_bucket_name)
-                RawToProcess.run(raw_file_name=raw_file_name[0])
+                raw_to_process_obj = RawToProcess(raw_bucket_name, clean_bucket_name)
+                raw_to_process_obj.run(raw_file_name=raw_file_name[0])
 
                 Clean_Bucket_name = "sph-clean-data"
                 start_date = a_week
