@@ -19,18 +19,13 @@ def full_load_fun() -> str:
 
         #Channel_Id = 'UC4p_I9eiRewn2KoU-nawrDg'
 
-        # channel_ids = [
-        #     'UC4p_I9eiRewn2KoU-nawrDg',  # Strait Times
-        #     'UC0GP1HDhGZTLih7B89z_cTg',  # Business Times
-        #     'UCrbQxu0YkoVWu2dw5b1MzNg',  # ZaoBao
-        #     'UCs0xZ60FSNxFxHPVFFsXNTA',  # Tamil Marusu
-        #     'UC_WgSFSkn7112rmJQcHSUIQ'  # Berita Harian
-        # ]
         channel_ids = [
-                'UCrbQxu0YkoVWu2dw5b1MzNg',  # ZaoBao
-                'UCs0xZ60FSNxFxHPVFFsXNTA',  # Tamil Marusu
-                'UC_WgSFSkn7112rmJQcHSUIQ'  # Berita Harian
-            ]
+            'UC4p_I9eiRewn2KoU-nawrDg',  # Strait Times
+            'UC0GP1HDhGZTLih7B89z_cTg',  # Business Times
+            'UCrbQxu0YkoVWu2dw5b1MzNg',  # ZaoBao
+            'UCs0xZ60FSNxFxHPVFFsXNTA',  # Tamil Marusu
+            'UC_WgSFSkn7112rmJQcHSUIQ'  # Berita Harian
+        ]
 
         # Create a date that is 7 days before now
         Today_Date = datetime.datetime.now()
@@ -41,6 +36,7 @@ def full_load_fun() -> str:
         # Bucket_name of aws S3 that we have created manually
         Raw_Data_Loading_Bucket_Name = "sph-raw-data"
         Clean_Bucket_Name = "sph-clean-data"
+        Stats_Bucket_Name = "sph-stats-data"
 
         Extracting_Date_Range = f"Extracting Data from {Seven_Day_Delta_Time} to {Today_Date}"
         print(Extracting_Date_Range)
@@ -51,6 +47,7 @@ def full_load_fun() -> str:
             """Calling Classes and its Methods"""
             # Creating an instance of our class FullLoadDataToS3
             FullLoadDataToS3_obj = FullLoadDataToS3(Api_Key, Channel_Id)
+            FullLoadDataToS3_obj.get_channel_statistics(Stats_Bucket_Name)
 
             # Call the `FullLoadDataToS3_obj.run()` function with the date 7 days ago as the argument and bucket_name
             Raw_File_Name = FullLoadDataToS3_obj.run(End_Date=Week_Past_Date, Bucket_Name=Raw_Data_Loading_Bucket_Name)
